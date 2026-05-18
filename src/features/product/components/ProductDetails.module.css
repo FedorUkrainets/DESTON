@@ -1,0 +1,110 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 320px);
+  gap: 48px;
+  align-items: start;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.chartColumn {
+  /* Holds either the size-chart popover or nothing — width stays reserved. */
+  min-height: 1px;
+}
+
+.galleryColumn,
+.infoColumn,
+.chartColumn {
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 24px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  row-gap: 14px;
+  column-gap: 16px;
+  margin: 0;
+}
+
+.specRow {
+  display: contents;
+}
+
+.specKey {
+  font-size: 14px;
+  color: var(--color-fg-muted);
+}
+
+.specVal {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-fg);
+}
+
+.compLine {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-fg);
+  line-height: 1.5;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  margin-top: 28px;
+  padding-top: 24px;
+}
+
+.addBtn {
+  width: min(320px, 100%);
+  padding: 14px 16px;
+  background: var(--color-fg);
+  color: #000;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 0;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: var(--color-accent);
+}
+
+.addBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chartBtn {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--color-fg);
+  border: 1px solid var(--color-fg);
+  font-size: 13px;
+}
+
+.chartBtn:hover {
+  background: var(--color-fg);
+  color: #000;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

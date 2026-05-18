@@ -1,0 +1,77 @@
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  padding: 32px 16px;
+}
+
+.banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 880px;
+  aspect-ratio: 16 / 10;
+  background:
+    radial-gradient(120% 60% at 50% 100%, rgba(255, 61, 167, 0.08), transparent 70%),
+    #0a0a0a;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: transform 200ms ease-out;
+}
+
+.banner:hover {
+  transform: translateY(-2px);
+}
+
+.bannerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  padding: 0 56px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.brand {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-fg);
+}
+
+.brandMirror {
+  /* The mock shows the wordmark twice flanking a central image —
+     we render it twice so the composition matches the design. */
+}
+
+.cta {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border: 1px solid var(--color-fg);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--color-fg);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.banner:hover .cta {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .bannerInner {
+    padding: 0 16px;
+    gap: 12px;
+  }
+}

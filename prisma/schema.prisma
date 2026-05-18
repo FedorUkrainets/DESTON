@@ -1,0 +1,199 @@
+// =============================================================================
+// DESTON — Prisma schema
+//
+// Production schema:
+// - Product / ProductImage / ProductVariant (size+color, stock, price override)
+// - Order / OrderItem / OrderStatus / PaymentStatus / Payment
+// - DeliveryMethod (extensible for future couriers)
+// - Audit timestamps everywhere
+// =============================================================================
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+enum ProductSize {
+  S
+  M
+  L
+  XL
+}
+
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  WAITING_FOR_CAPTURE
+  SUCCEEDED
+  CANCELED
+  REFUNDED
+  FAILED
+}
+
+enum PaymentProvider {
+  YOOKASSA
+}
+
+enum DeliveryProvider {
+  CDEK
+  POCHTA
+  BOXBERRY
+  YANDEX
+  PICKUP
+}
+
+// -----------------------------------------------------------------------------
+// Catalog
+// -----------------------------------------------------------------------------
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  composition String
+  cut         String?
+  basePrice   Int
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  images   ProductImage[]
+  variants ProductVariant[]
+
+  @@index([isActive, sortOrder])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, position])
+}
+
+model ProductVariant {
+  id        String      @id @default(cuid())
+  productId String
+  size      ProductSize
+  color     String
+  sku       String      @unique
+  stock     Int         @default(0)
+  priceOverride Int?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@unique([productId, size, color])
+  @@index([productId])
+}
+
+// -----------------------------------------------------------------------------
+// Orders
+// -----------------------------------------------------------------------------
+
+model Order {
+  id              String        @id @default(cuid())
+  number          String        @unique
+  status          OrderStatus   @default(PENDING)
+
+  // Customer
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+
+  // Delivery
+  deliveryProvider DeliveryProvider
+  city             String
+  address          String
+  pickupPointCode  String?
+  comment          String?
+
+  // Money
+  subtotal        Int
+  deliveryCost    Int           @default(0)
+  total           Int
+
+  // Misc
+  ipAddress       String?
+  userAgent       String?
+
+  items           OrderItem[]
+  payments        Payment[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  variantId   String
+
+  // Denormalized snapshot for invoice consistency.
+  productName String
+  size        ProductSize
+  color       String
+  unitPrice   Int
+  quantity    Int
+
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+}
+
+// -----------------------------------------------------------------------------
+// Payments
+// -----------------------------------------------------------------------------
+
+model Payment {
+  id              String          @id @default(cuid())
+  orderId         String
+  provider        PaymentProvider
+  providerPaymentId String?       @unique
+  status          PaymentStatus   @default(PENDING)
+  amount          Int
+  currency        String          @default("RUB")
+  confirmationUrl String?
+  rawPayload      Json?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+}

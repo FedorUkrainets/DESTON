@@ -1,0 +1,151 @@
+.form {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.summary {
+  margin-bottom: 32px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-fg);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.summaryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.summaryItem + .summaryItem {
+  border-top: 1px solid var(--color-border);
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  background: var(--color-tile);
+  border-radius: 6px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.thumbImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.summaryBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.summaryName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryPrice {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-fg);
+  white-space: nowrap;
+}
+
+.summaryTotalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.summaryTotalLabel {
+  font-size: 13px;
+  color: var(--color-fg-muted);
+}
+
+.summaryTotalValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-fg);
+}
+
+.summaryEmpty {
+  margin: 0;
+  text-align: center;
+  color: var(--color-fg-dim);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+}
+
+.left,
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rightTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.submitError {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 13px;
+}
+
+.submit {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--color-fg);
+  color: #000;
+  border-radius: 0;
+  font-size: 15px;
+  transition: background 120ms ease-out, color 120ms ease-out, opacity 120ms ease-out;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--color-accent);
+}
+
+.submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
