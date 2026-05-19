@@ -4,7 +4,7 @@
 # Multi-stage: deps → build → runtime (distroless-like, non-root user)
 # =============================================================================
 
-ARG NODE_VERSION=20.18-alpine
+ARG NODE_VERSION=20-alpine3.19
 
 # -----------------------------------------------------------------------------
 # 1) deps — install only production-able deps based on the lock file
@@ -12,7 +12,7 @@ ARG NODE_VERSION=20.18-alpine
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 
-RUN apk add --no-cache gcompat openssl
+RUN apk add --no-cache gcompat
 
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
