@@ -44,9 +44,8 @@ const nextConfig: NextConfig = {
       ? [{ protocol: "https", hostname: supabaseHost, pathname: "/**" }]
       : [],
   },
-  experimental: {
-    typedRoutes: false,
-  },
+  // typedRoutes moved out of experimental in Next.js 15.5+
+  typedRoutes: false,
   async headers() {
     return [
       {

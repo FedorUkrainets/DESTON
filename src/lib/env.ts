@@ -2,29 +2,50 @@ import { z } from "zod";
 
 /**
  * Strict, runtime-validated environment.
- * Imported only on the server. Keep client-safe values prefixed with NEXT_PUBLIC_.
+ *
+ * During `next build` (phase-production-build) we relax the schema so the
+ * production image can be built on machines that don't carry the real DB URL
+ * or secrets. At runtime (`next start`) the schema is strict — missing
+ * required values crash the boot.
  */
+
+const isBuildPhase =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  process.env.NEXT_BUILD === "1";
+
+const requiredString = (msg: string) =>
+  isBuildPhase ? z.string().optional().default("__build_placeholder__") : z.string().min(1, msg);
+
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  DATABASE_URL: requiredString("DATABASE_URL is required"),
   DIRECT_URL: z.string().optional(),
 
-  NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_SITE_URL: z.string().default("http://localhost:3000"),
   NEXT_PUBLIC_SITE_NAME: z.string().default("DESTON"),
 
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   SUPABASE_BUCKET: z.string().default("products"),
 
   RESEND_API_KEY: z.string().optional(),
-  RESEND_FROM_EMAIL: z.string().default("DESTON <no-reply@deston.store>"),
-  RESEND_REPLY_TO: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().default("DESTON <onboarding@resend.dev>"),
+  RESEND_REPLY_TO: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim().length > 0 ? v : undefined)),
   ADMIN_NOTIFICATION_EMAIL: z.string().email().default("anaono542@gmail.com"),
 
-  YOOKASSA_SHOP_ID: z.string().optional(),
-  YOOKASSA_SECRET_KEY: z.string().optional(),
-  YOOKASSA_RETURN_URL: z.string().url().default("http://localhost:3000/checkout/success"),
+  YOOKASSA_SHOP_ID: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim().length > 0 ? v : undefined)),
+  YOOKASSA_SECRET_KEY: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim().length > 0 ? v : undefined)),
+  YOOKASSA_RETURN_URL: z.string().default("http://localhost:3000/checkout/success"),
   YOOKASSA_WEBHOOK_SECRET: z.string().optional(),
 
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(60),
@@ -34,7 +55,6 @@ const serverSchema = z.object({
 const parsed = serverSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  // eslint-disable-next-line no-console
   console.error("Invalid environment configuration:", parsed.error.flatten().fieldErrors);
   throw new Error("Invalid environment configuration. See logs above.");
 }

@@ -28,6 +28,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Optional build args — only used to silence env-validation during build.
+# Real values come from .env at runtime via docker-compose env.
+ARG DATABASE_URL=postgresql://placeholder:placeholder@placeholder:5432/placeholder
+ENV DATABASE_URL=$DATABASE_URL
+ENV NEXT_BUILD=1
+
 RUN npx prisma generate
 RUN npm run build
 
