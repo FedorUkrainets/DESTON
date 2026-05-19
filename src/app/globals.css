@@ -1,7 +1,4 @@
-/* =============================================================================
-   DESTON — global stylesheet.
-   Page-scoped styling lives in *.module.css files. Keep this file minimal.
-   ========================================================================== */
+/* DESTON — global stylesheet. Page-scoped styling lives in *.module.css files. Keep this file minimal.*/
 
 :root {
   --color-bg: #000000;

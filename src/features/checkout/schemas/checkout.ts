@@ -45,6 +45,9 @@ export const CheckoutFormSchema = z.object({
   pickupPointCode: z.string().trim().max(40).optional().default(""),
   deliveryProvider: DeliveryProviderSchema,
   comment: CommentSchema,
+  consent: z
+    .boolean()
+    .refine((v) => v === true, "Необходимо согласие с условиями оферты и обработкой данных"),
 });
 export type CheckoutFormValues = z.infer<typeof CheckoutFormSchema>;
 

@@ -124,6 +124,40 @@
   font-size: 13px;
 }
 
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.consentInput {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.consentText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-fg-muted);
+}
+
+.consentLink {
+  color: var(--color-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 120ms ease-out;
+}
+
+.consentLink:hover {
+  color: var(--color-accent);
+}
+
 .submit {
   width: 100%;
   padding: 14px 16px;

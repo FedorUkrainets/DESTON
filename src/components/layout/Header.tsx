@@ -7,7 +7,7 @@ import { useCartStore, selectTotalCount } from "@/features/cart/store/cartStore"
 import styles from "./Header.module.css";
 
 interface NavItem {
-  href: "/" | "/catalog" | "/contacts" | "/help";
+  href: "/" | "/catalog" | "/contacts" | "/help" | "/privacy";
   label: string;
 }
 
@@ -16,6 +16,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: "/catalog", label: "Каталог" },
   { href: "/contacts", label: "Контакты" },
   { href: "/help", label: "Помощь" },
+  { href: "/privacy", label: "Политика" },
 ] as const;
 
 export function Header(): React.ReactElement {

@@ -57,13 +57,16 @@ export async function POST(request: NextRequest): Promise<Response> {
       });
     } catch (err) {
       console.error("[orders] payment creation failed", err);
-      // We don't roll back the order — operator can retry payment manually.
     }
 
-    // Send the confirmation email outside the critical path.
-    sendOrderConfirmationEmail(order).catch((err: unknown) => {
-      console.error("[orders] email send failed", err);
-    });
+    // Email policy:
+    //  - YooKassa configured (confirmationUrl present)  → wait for webhook to mark as PAID and email then.
+    //  - Stub mode (no creds, no confirmationUrl)        → send email now so dev/test still receives it.
+    if (!confirmationUrl) {
+      sendOrderConfirmationEmail(order).catch((err: unknown) => {
+        console.error("[orders] email send failed", err);
+      });
+    }
 
     return apiSuccess(
       {

@@ -20,6 +20,7 @@ const serverSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().default("DESTON <no-reply@deston.store>"),
   RESEND_REPLY_TO: z.string().optional(),
+  ADMIN_NOTIFICATION_EMAIL: z.string().email().default("anaono542@gmail.com"),
 
   YOOKASSA_SHOP_ID: z.string().optional(),
   YOOKASSA_SECRET_KEY: z.string().optional(),

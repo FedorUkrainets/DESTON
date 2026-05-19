@@ -1,5 +1,14 @@
-import Link from "next/link";
 import styles from "./Footer.module.css";
+
+interface ExternalLink {
+  href: string;
+  label: string;
+}
+
+const EXTERNAL_LINKS: readonly ExternalLink[] = [
+  { href: "https://t.me/DESTONSTORE", label: "Telegram" },
+  { href: "https://t.me/destonot", label: "Отзывы" },
+] as const;
 
 export function Footer(): React.ReactElement {
   return (
@@ -13,21 +22,21 @@ export function Footer(): React.ReactElement {
         </svg>
       </div>
 
-      <div className={styles.center} aria-hidden="false">
-        ALL RIGHTS RESERVE
-      </div>
+      <div className={styles.center}>ALL RIGHTS RESERVE</div>
 
       <ul className={styles.links}>
-        <li>
-          <Link href="/contacts" className={styles.link}>
-            Telegram
-          </Link>
-        </li>
-        <li>
-          <Link href="/contacts" className={styles.link}>
-            Отзывы
-          </Link>
-        </li>
+        {EXTERNAL_LINKS.map((link) => (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              className={styles.link}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </footer>
   );

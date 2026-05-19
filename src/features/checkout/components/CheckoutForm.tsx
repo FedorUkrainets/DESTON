@@ -24,6 +24,7 @@ const INITIAL_VALUES: CheckoutFormValues = {
   pickupPointCode: "",
   deliveryProvider: "CDEK",
   comment: "",
+  consent: false,
 };
 
 type ErrorMap = Partial<Record<keyof CheckoutFormValues, string>>;
@@ -229,6 +230,33 @@ export function CheckoutForm(): React.ReactElement {
             }
             error={errors.deliveryProvider}
           />
+
+          <label className={styles.consent}>
+            <input
+              type="checkbox"
+              className={styles.consentInput}
+              checked={values.consent}
+              onChange={(e) => update("consent", e.target.checked)}
+              aria-invalid={errors.consent ? true : undefined}
+            />
+            <span className={styles.consentText}>
+              Я согласен с условиями{" "}
+              <a href="/offer" target="_blank" rel="noopener noreferrer" className={styles.consentLink}>
+                публичной оферты
+              </a>{" "}
+              и{" "}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.consentLink}
+              >
+                политикой обработки персональных данных
+              </a>
+              .
+            </span>
+          </label>
+          {errors.consent ? <p className={styles.submitError}>{errors.consent}</p> : null}
 
           {submitError ? <p className={styles.submitError}>{submitError}</p> : null}
 
