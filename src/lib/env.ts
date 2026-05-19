@@ -21,7 +21,15 @@ const serverSchema = z.object({
   DATABASE_URL: requiredString("DATABASE_URL is required"),
   DIRECT_URL: z.string().optional(),
 
-  NEXT_PUBLIC_SITE_URL: z.string().default("http://localhost:3000"),
+  NEXT_PUBLIC_SITE_URL: z
+    .string()
+    .default("http://localhost:3000")
+    .transform((v) => {
+      const trimmed = v.trim();
+      if (!trimmed) return "http://localhost:3000";
+      // Ensure a protocol is present — `new URL()` throws on bare IPs/domains.
+      return /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+    }),
   NEXT_PUBLIC_SITE_NAME: z.string().default("DESTON"),
 
   NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),

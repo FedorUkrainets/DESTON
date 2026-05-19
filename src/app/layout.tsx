@@ -7,8 +7,18 @@ import { CartProvider } from "@/components/providers/CartProvider";
 import { env } from "@/lib/env";
 import "./globals.css";
 
-const siteUrl = env.NEXT_PUBLIC_SITE_URL;
 const siteName = env.NEXT_PUBLIC_SITE_NAME;
+
+// Resolve a guaranteed-valid base URL — falls back to localhost on any parse error.
+function resolveSiteUrl(): URL {
+  try {
+    return new URL(env.NEXT_PUBLIC_SITE_URL);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
+
+const siteUrl = resolveSiteUrl().toString();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
