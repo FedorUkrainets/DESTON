@@ -8,7 +8,10 @@ export const metadata: Metadata = {
   description: "Все товары DESTON.",
 };
 
-export const revalidate = 60;
+// SSR на каждый запрос — данные каталога живут в БД и меняются на лету;
+// статическая генерация во время `next build` без работающей БД бессмысленна.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function CatalogPage(): Promise<React.ReactElement> {
   const products = await getProductSummaries();

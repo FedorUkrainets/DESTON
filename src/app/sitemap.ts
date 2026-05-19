@@ -2,6 +2,11 @@ import type { MetadataRoute } from "next";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
+// Generate sitemap dynamically — avoids hitting the DB at `next build`
+// when DATABASE_URL points to the build-time placeholder.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.NEXT_PUBLIC_SITE_URL;
   const staticEntries: MetadataRoute.Sitemap = [
