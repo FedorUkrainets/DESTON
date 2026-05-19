@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # =============================================================================
 # DESTON — Production-ready Next.js 15 (App Router) Dockerfile
-# Multi-stage: deps → build → runtime. Debian-slim base for max reliability
-# on hosts where Alpine CDN is unreachable from inside the build container.
+# Multi-stage: deps → builder → migrator → runner (Debian-slim base).
 # =============================================================================
 
 ARG NODE_VERSION=20-slim
@@ -13,7 +12,6 @@ ARG NODE_VERSION=20-slim
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 
-# openssl + ca-certificates are required by Prisma to talk to Postgres over TLS.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends openssl ca-certificates \
  && rm -rf /var/lib/apt/lists/*
@@ -46,7 +44,28 @@ RUN npx prisma generate
 RUN npm run build
 
 # -----------------------------------------------------------------------------
-# 3) runner — minimal runtime image
+# 3) migrator — runs `prisma migrate deploy` / `db push` and exits.
+#    Uses the full builder's node_modules so Prisma CLI is available offline.
+#    Runs as root — fine, container is short-lived and only touches the DB.
+# -----------------------------------------------------------------------------
+FROM node:${NODE_VERSION} AS migrator
+WORKDIR /app
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends openssl ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
+
+# Default to applying migrations if present, else syncing schema directly.
+CMD ["sh", "-c", "if [ -d /app/prisma/migrations ] && [ \"$(ls -A /app/prisma/migrations 2>/dev/null)\" ]; then npx prisma migrate deploy; else npx prisma db push --accept-data-loss --skip-generate; fi"]
+
+# -----------------------------------------------------------------------------
+# 4) runner — minimal runtime image with non-root user
 # -----------------------------------------------------------------------------
 FROM node:${NODE_VERSION} AS runner
 WORKDIR /app
@@ -56,13 +75,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Runtime deps: openssl for Prisma's TLS connections.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends openssl ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user with a real home directory.
 RUN groupadd --system --gid 1001 nodejs \
- && useradd  --system --uid 1001 --gid nodejs nextjs
+ && useradd  --system --uid 1001 --gid nodejs --create-home --home-dir /home/nextjs nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

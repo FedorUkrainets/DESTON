@@ -28,13 +28,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: migrator
     depends_on:
       db:
         condition: service_healthy
     environment:
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
-    command: ["sh", "-c", "npx prisma migrate deploy"]
     restart: "no"
     networks:
       - deston-net
@@ -45,6 +45,7 @@ services:
       args:
         DATABASE_URL: ${DATABASE_URL}
       dockerfile: Dockerfile
+      target: runner
     restart: always
     depends_on:
       db:
