@@ -12,7 +12,7 @@ ARG NODE_VERSION=20.18-alpine
 FROM node:${NODE_VERSION} AS deps
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat openssl
+RUN apk add --no-cache gcompat openssl
 
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
